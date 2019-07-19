@@ -1,0 +1,32 @@
+{
+  "name": "redux-json-api-module",
+  "version": "1.0.0",
+  "description": "Redux reducer, actions, action creators, and selectors for interacting with JSON API.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kp-software/redux-json-api-module.git"
+  },
+  "keywords": [
+    "redux",
+    "json-api",
+    "json",
+    "api"
+  ],
+  "author": "Kevin Pheasey",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kp-software/redux-json-api-module/issues"
+  },
+  "homepage": "https://github.com/kp-software/redux-json-api-module#readme",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "deepmerge": "^4.0.0",
+    "json-api-normalizer": "^0.4.15",
+    "qs": "^6.7.0",
+    "redux-axios-middleware": "^4.0.1"
+  }
+}
