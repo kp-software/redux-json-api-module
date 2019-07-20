@@ -2,7 +2,7 @@ import qs from 'qs';
 import normalize from 'json-api-normalizer';
 import merge from 'deepmerge';
 
-export * from './src/selectors';
+export * from './selectors';
 
 export const CLEAR_RECORDS = 'redux-json-api-module/api/CLEAR_RECORDS';
 export const FETCH_RECORDS = 'redux-json-api-module/api/FETCH_RECORDS';
