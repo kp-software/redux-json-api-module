@@ -7,10 +7,10 @@ export * from './selectors';
 export const CLEAR_RECORDS = 'redux-json-api-module/api/CLEAR_RECORDS';
 export const FETCH_RECORDS = 'redux-json-api-module/api/FETCH_RECORDS';
 export const FETCH_RECORDS_SUCCESS = 'redux-json-api-module/api/FETCH_RECORDS_SUCCESS';
-export const SAVE_RECORD = 'redux-json-api-module/inspection/SAVE_RECORD';
-export const SAVE_RECORD_SUCCESS = 'redux-json-api-module/inspection/SAVE_RECORD_SUCCESS';
-export const DELETE_RECORD = 'redux-json-api-module/inspection/DELETE_RECORD';
-export const DELETE_RECORD_FAIL = 'redux-json-api-module/inspection/DELETE_RECORD_FAIL';
+export const SAVE_RECORD = 'redux-json-api-module/api/SAVE_RECORD';
+export const SAVE_RECORD_SUCCESS = 'redux-json-api-module/api/SAVE_RECORD_SUCCESS';
+export const DELETE_RECORD = 'redux-json-api-module/api/DELETE_RECORD';
+export const DELETE_RECORD_FAIL = 'redux-json-api-module/api/DELETE_RECORD_FAIL';
 
 const INITIAL_STATE = {
   loading: false,
