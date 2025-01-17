@@ -1,6 +1,6 @@
 {
   "name": "redux-json-api-module",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Redux reducer, actions, action creators, and selectors for interacting with JSON API.",
   "main": "./dist/index.js",
   "scripts": {
