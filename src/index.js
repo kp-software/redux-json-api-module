@@ -1,6 +1,6 @@
 import qs from 'qs';
 import normalize from 'json-api-normalizer';
-import merge from 'deepmerge';
+import produce from 'immer';
 
 export * from './selectors';
 
@@ -16,19 +16,19 @@ const INITIAL_STATE = {
   loading: false,
 };
 
-// overwrite arrays
-//   this could be improved by comparing array contents,
-//   but arrays of objects will need to be converted to
-//   JSON first which may be too expensive
-const arrayMerge = (a, b) => b;
 const mergeResult = (state, resp) => {
   if (!resp.data) return state;
 
-  return merge(
-    state,
-    normalize(resp, { camelizeKeys: false, camelizeTypeValues: false }),
-    { arrayMerge },
-  );
+  const normalizedData = normalize(resp, { camelizeKeys: false, camelizeTypeValues: false });
+
+  return produce(state, draft => {
+    Object.keys(normalizedData).forEach(key => {
+      if (!draft[key]) {
+        draft[key] = {};
+      }
+      Object.assign(draft[key], normalizedData[key]);
+    });
+  });
 };
 
 export default function reducer(state = INITIAL_STATE, action) {
