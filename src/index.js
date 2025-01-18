@@ -1,6 +1,6 @@
 import qs from 'qs';
 import normalize from 'json-api-normalizer';
-const produce = require('immer').default;
+import { produce } from "immer"
 
 export * from './selectors';
 
