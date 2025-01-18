@@ -1,6 +1,6 @@
 import qs from 'qs';
 import normalize from 'json-api-normalizer';
-import { produce } from "immer"
+import { produce } from 'immer';
 
 export * from './selectors';
 
