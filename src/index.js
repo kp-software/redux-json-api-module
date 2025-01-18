@@ -1,7 +1,6 @@
 import qs from 'qs';
 import normalize from 'json-api-normalizer';
 import immer from 'immer';
-const { produce } = immer;
 
 export * from './selectors';
 
@@ -22,7 +21,7 @@ const mergeResult = (state, resp) => {
 
   const normalizedData = normalize(resp, { camelizeKeys: false, camelizeTypeValues: false });
 
-  return produce(state, draft => {
+  return immer.produce(state, draft => {
     Object.keys(normalizedData).forEach(key => {
       if (!draft[key]) {
         draft[key] = {};
