@@ -24,7 +24,6 @@
   },
   "homepage": "https://github.com/kp-software/redux-json-api-module#readme",
   "dependencies": {
-    "immer": "^10.1.1",
     "json-api-normalizer": "^0.4.15",
     "qs": "^6.10.3"
   },

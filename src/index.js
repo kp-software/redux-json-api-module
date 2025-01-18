@@ -1,6 +1,5 @@
 import qs from 'qs';
 import normalize from 'json-api-normalizer';
-import immer from 'immer';
 
 export * from './selectors';
 
@@ -21,14 +20,27 @@ const mergeResult = (state, resp) => {
 
   const normalizedData = normalize(resp, { camelizeKeys: false, camelizeTypeValues: false });
 
-  return immer.produce(state, draft => {
-    Object.keys(normalizedData).forEach(key => {
-      if (!draft[key]) {
-        draft[key] = {};
+  const deepMerge = (target, source) => {
+    for (const key in source) {
+      if (source[key] instanceof Object) {
+        if (!target[key]) target[key] = {};
+        deepMerge(target[key], source[key]);
+      } else {
+        target[key] = source[key];
       }
-      Object.assign(draft[key], normalizedData[key]);
-    });
+    }
+  };
+
+  const newState = { ...state };
+
+  Object.keys(normalizedData).forEach(key => {
+    if (!newState[key]) {
+      newState[key] = {};
+    }
+    deepMerge(newState[key], normalizedData[key]);
   });
+
+  return newState;
 };
 
 export default function reducer(state = INITIAL_STATE, action) {
