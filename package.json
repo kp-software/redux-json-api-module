@@ -7,7 +7,7 @@
   "scripts": {
     "build": "babel src --out-dir dist",
     "prepublish": "npm run build",
-    "postinstall": "npm run build"
+    "postinstall": "npm install --only=dev && npm run build"
   },
   "repository": {
     "type": "git",
