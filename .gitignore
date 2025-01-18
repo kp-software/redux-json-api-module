@@ -95,6 +95,9 @@ typings/
 # DynamoDB Local files
 .dynamodb/
 
+# pnp files
 .pnp.*
+
+.yarn
 
 # End of https://www.gitignore.io/api/node

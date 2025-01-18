@@ -1,8 +1,8 @@
 {
   "name": "redux-json-api-module",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Redux reducer, actions, action creators, and selectors for interacting with JSON API.",
-  "main": "./dist/index.js",
+  "main": "dist/index.js",
   "types": "index.t.ts",
   "scripts": {
     "build": "babel src --out-dir dist",
