@@ -28,7 +28,6 @@ exports.queryString = void 0;
 exports.saveRecord = saveRecord;
 var _qs = _interopRequireDefault(require("qs"));
 var _jsonApiNormalizer = _interopRequireDefault(require("json-api-normalizer"));
-var _immer = _interopRequireDefault(require("immer"));
 var _selectors = require("./selectors");
 Object.keys(_selectors).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -64,14 +63,24 @@ var mergeResult = function mergeResult(state, resp) {
     camelizeKeys: false,
     camelizeTypeValues: false
   });
-  return (0, _immer["default"])(state, function (draft) {
-    Object.keys(normalizedData).forEach(function (key) {
-      if (!draft[key]) {
-        draft[key] = {};
+  var _deepMerge = function deepMerge(target, source) {
+    for (var key in source) {
+      if (source[key] instanceof Object) {
+        if (!target[key]) target[key] = {};
+        _deepMerge(target[key], source[key]);
+      } else {
+        target[key] = source[key];
       }
-      Object.assign(draft[key], normalizedData[key]);
-    });
+    }
+  };
+  var newState = _objectSpread({}, state);
+  Object.keys(normalizedData).forEach(function (key) {
+    if (!newState[key]) {
+      newState[key] = {};
+    }
+    _deepMerge(newState[key], normalizedData[key]);
   });
+  return newState;
 };
 function reducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : INITIAL_STATE;
