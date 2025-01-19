@@ -27,7 +27,6 @@ exports.fetchRecords = fetchRecords;
 exports.queryString = void 0;
 exports.saveRecord = saveRecord;
 var _qs = _interopRequireDefault(require("qs"));
-var _jsonApiNormalizer = _interopRequireDefault(require("json-api-normalizer"));
 var _selectors = require("./selectors");
 Object.keys(_selectors).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -61,7 +60,9 @@ var mergeResult = function mergeResult(state, resp) {
   if (!resp.data) return state;
   var _mergeDeep = function mergeDeep(target, source) {
     for (var key in source) {
-      if (source[key] instanceof Object) {
+      if (Array.isArray(source[key])) {
+        target[key] = source[key];
+      } else if (source[key] instanceof Object) {
         if (!target[key]) target[key] = {};
         _mergeDeep(target[key], source[key]);
       } else {
@@ -75,7 +76,14 @@ var mergeResult = function mergeResult(state, resp) {
     if (!newState[record.type]) {
       newState[record.type] = {};
     }
-    _mergeDeep(newState[record.type][record.id] || {}, record);
+    if (!newState[record.type][record.id]) {
+      newState[record.type][record.id] = {
+        type: record.type,
+        id: record.id,
+        attributes: {}
+      };
+    }
+    _mergeDeep(newState[record.type][record.id].attributes, record.attributes);
   });
   return newState;
 };

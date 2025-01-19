@@ -1,5 +1,4 @@
 import qs from 'qs';
-import normalize from 'json-api-normalizer';
 
 export * from './selectors';
 
@@ -20,7 +19,9 @@ const mergeResult = (state, resp) => {
 
   const mergeDeep = (target, source) => {
     for (const key in source) {
-      if (source[key] instanceof Object) {
+      if (Array.isArray(source[key])) {
+        target[key] = source[key];
+      } else if (source[key] instanceof Object) {
         if (!target[key]) target[key] = {};
         mergeDeep(target[key], source[key]);
       } else {
@@ -37,8 +38,12 @@ const mergeResult = (state, resp) => {
       newState[record.type] = {};
     }
 
-    mergeDeep(newState[record.type][record.id] || {}, record);
-  })
+    if (!newState[record.type][record.id]) {
+      newState[record.type][record.id] = { type: record.type, id: record.id, attributes: {} };
+    }
+
+    mergeDeep(newState[record.type][record.id].attributes, record.attributes);
+  });
 
   return newState;
 };
