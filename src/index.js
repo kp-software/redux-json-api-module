@@ -20,11 +20,11 @@ const mergeResult = (state, resp) => {
 
   const normalizedData = normalize(resp, { camelizeKeys: false, camelizeTypeValues: false });
 
-  const deepMerge = (target, source) => {
+  const mergeDeep = (target, source) => {
     for (const key in source) {
       if (source[key] instanceof Object) {
         if (!target[key]) target[key] = {};
-        deepMerge(target[key], source[key]);
+        mergeDeep(target[key], source[key]);
       } else {
         target[key] = source[key];
       }
@@ -33,11 +33,16 @@ const mergeResult = (state, resp) => {
 
   const newState = { ...state };
 
-  Object.keys(normalizedData).forEach(key => {
-    if (!newState[key]) {
-      newState[key] = {};
+  Object.keys(normalizedData).forEach(recordType => {
+    if (!newState[recordType]) {
+      newState[recordType] = {};
     }
-    deepMerge(newState[key], normalizedData[key]);
+    Object.keys(normalizedData[recordType]).forEach(recordId => {
+      if (!newState[recordType][recordId]) {
+        newState[recordType][recordId] = {};
+      }
+      mergeDeep(newState[recordType][recordId], normalizedData[recordType][recordId]);
+    });
   });
 
   return newState;

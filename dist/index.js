@@ -63,22 +63,27 @@ var mergeResult = function mergeResult(state, resp) {
     camelizeKeys: false,
     camelizeTypeValues: false
   });
-  var _deepMerge = function deepMerge(target, source) {
+  var _mergeDeep = function mergeDeep(target, source) {
     for (var key in source) {
       if (source[key] instanceof Object) {
         if (!target[key]) target[key] = {};
-        _deepMerge(target[key], source[key]);
+        _mergeDeep(target[key], source[key]);
       } else {
         target[key] = source[key];
       }
     }
   };
   var newState = _objectSpread({}, state);
-  Object.keys(normalizedData).forEach(function (key) {
-    if (!newState[key]) {
-      newState[key] = {};
+  Object.keys(normalizedData).forEach(function (recordType) {
+    if (!newState[recordType]) {
+      newState[recordType] = {};
     }
-    _deepMerge(newState[key], normalizedData[key]);
+    Object.keys(normalizedData[recordType]).forEach(function (recordId) {
+      if (!newState[recordType][recordId]) {
+        newState[recordType][recordId] = {};
+      }
+      _mergeDeep(newState[recordType][recordId], normalizedData[recordType][recordId]);
+    });
   });
   return newState;
 };
