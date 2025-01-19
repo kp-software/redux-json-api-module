@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.5] - 2025-01-19
 ### Fixed
 - Fixed mergeResult method, renamed to resultMerge.  
-  The method now returns a new object instead of mutating the original object.
+  The method now returns a new object instead of mutating the original object. 
 
 ## [1.1.4] - 2025-01-18
 ### Fixed

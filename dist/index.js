@@ -50,33 +50,15 @@ var arrayMerge = function arrayMerge(a, b) {
 var resultMerge = function resultMerge(state, resp) {
   if (!resp.data) return state;
   console.debug('Response:', resp);
-  var normalizedResp = (0, _jsonApiNormalizer["default"])(resp.data, {
+  var newState = _objectSpread({}, state);
+  var normalizedResp = (0, _jsonApiNormalizer["default"])(resp, {
     camelizeKeys: false,
     camelizeTypeValues: false
   });
   console.debug('Normalized Response:', normalizedResp);
-  var records = Array.isArray(normalizedResp.data) ? normalizedResp.data : [normalizedResp.data];
-  var newState = _objectSpread({}, state);
-  records.forEach(function (record) {
-    if (!record || !record.type || !record.id || !record.attributes) {
-      console.error('Invalid record', record);
-      return;
-    }
-    if (!newState[record.type]) {
-      newState[record.type] = {};
-    }
-    if (!newState[record.type][record.id]) {
-      newState[record.type][record.id] = {
-        type: record.type,
-        id: record.id,
-        attributes: {}
-      };
-    }
-    newState[record.type][record.id].attributes = (0, _deepmerge["default"])(newState[record.type][record.id].attributes, record.attributes, {
-      arrayMerge: arrayMerge
-    });
+  return (0, _deepmerge["default"])(newState, normalizedResp, {
+    arrayMerge: arrayMerge
   });
-  return newState;
 };
 function reducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : INITIAL_STATE;

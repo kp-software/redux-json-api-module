@@ -22,34 +22,15 @@ const resultMerge = (state, resp) => {
   if (!resp.data) return state;
   console.debug('Response:', resp);
 
-  const normalizedResp = normalize(resp.data, { camelizeKeys: false, camelizeTypeValues: false });
+  const newState = { ...state };
+  const normalizedResp = normalize(resp, { camelizeKeys: false, camelizeTypeValues: false });
   console.debug('Normalized Response:', normalizedResp);
 
-  const records = Array.isArray(normalizedResp.data) ? normalizedResp.data : [normalizedResp.data];
-  const newState = { ...state };
-
-  records.forEach(record => {
-    if (!record || !record.type || !record.id || !record.attributes) {
-      console.error('Invalid record', record);
-      return;
-    }
-
-    if (!newState[record.type]) {
-      newState[record.type] = {};
-    }
-
-    if (!newState[record.type][record.id]) {
-      newState[record.type][record.id] = { type: record.type, id: record.id, attributes: {} };
-    }
-
-    newState[record.type][record.id].attributes = merge(
-      newState[record.type][record.id].attributes,
-      record.attributes,
-      { arrayMerge }
-    );
-  });
-
-  return newState;
+  return merge(
+    newState,
+    normalizedResp,
+    { arrayMerge }
+  )
 };
 
 export default function reducer(state = INITIAL_STATE, action) {
