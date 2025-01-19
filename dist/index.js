@@ -49,13 +49,11 @@ var arrayMerge = function arrayMerge(a, b) {
 };
 var resultMerge = function resultMerge(state, resp) {
   if (!resp.data) return state;
-  console.debug('Response:', resp);
   var newState = _objectSpread({}, state);
   var normalizedResp = (0, _jsonApiNormalizer["default"])(resp, {
     camelizeKeys: false,
     camelizeTypeValues: false
   });
-  console.debug('Normalized Response:', normalizedResp);
   return (0, _deepmerge["default"])(newState, normalizedResp, {
     arrayMerge: arrayMerge
   });

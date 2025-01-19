@@ -20,11 +20,9 @@ const arrayMerge = (a, b) => b;
 
 const resultMerge = (state, resp) => {
   if (!resp.data) return state;
-  console.debug('Response:', resp);
 
   const newState = { ...state };
   const normalizedResp = normalize(resp, { camelizeKeys: false, camelizeTypeValues: false });
-  console.debug('Normalized Response:', normalizedResp);
 
   return merge(
     newState,
