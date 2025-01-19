@@ -1573,6 +1573,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"deepmerge@npm:^4.3.1":
+  version: 4.3.1
+  resolution: "deepmerge@npm:4.3.1"
+  checksum: 10c0/e53481aaf1aa2c4082b5342be6b6d8ad9dfe387bc92ce197a66dea08bd4265904a087e75e464f14d1347cf2ac8afe1e4c16b266e0561cc5df29382d3c5f80044
+  languageName: node
+  linkType: hard
+
 "dunder-proto@npm:^1.0.1":
   version: 1.0.1
   resolution: "dunder-proto@npm:1.0.1"
@@ -2533,6 +2540,7 @@ __metadata:
     "@babel/core": "npm:^7.5.5"
     "@babel/preset-env": "npm:^7.5.5"
     babel-loader: "npm:^8.0.6"
+    deepmerge: "npm:^4.3.1"
     json-api-normalizer: "npm:^0.4.15"
     qs: "npm:^6.10.3"
   languageName: unknown

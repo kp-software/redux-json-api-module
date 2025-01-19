@@ -3,42 +3,29 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var _exportNames = {
-  CLEAR_RECORDS: true,
-  FETCH_RECORDS: true,
-  FETCH_RECORDS_SUCCESS: true,
-  SAVE_RECORD: true,
-  SAVE_RECORD_SUCCESS: true,
-  DELETE_RECORD: true,
-  DELETE_RECORD_FAIL: true,
-  queryString: true,
-  clearRecords: true,
-  fetchRecords: true,
-  fetchRecord: true,
-  saveRecord: true,
-  deleteRecord: true
-};
 exports.SAVE_RECORD_SUCCESS = exports.SAVE_RECORD = exports.FETCH_RECORDS_SUCCESS = exports.FETCH_RECORDS = exports.DELETE_RECORD_FAIL = exports.DELETE_RECORD = exports.CLEAR_RECORDS = void 0;
 exports.clearRecords = clearRecords;
 exports["default"] = reducer;
 exports.deleteRecord = deleteRecord;
 exports.fetchRecord = fetchRecord;
 exports.fetchRecords = fetchRecords;
+Object.defineProperty(exports, "getRecord", {
+  enumerable: true,
+  get: function get() {
+    return _selectors.getRecord;
+  }
+});
+Object.defineProperty(exports, "getRelationship", {
+  enumerable: true,
+  get: function get() {
+    return _selectors.getRelationship;
+  }
+});
 exports.queryString = void 0;
 exports.saveRecord = saveRecord;
 var _qs = _interopRequireDefault(require("qs"));
+var _deepmerge = _interopRequireDefault(require("deepmerge"));
 var _selectors = require("./selectors");
-Object.keys(_selectors).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
-  if (key in exports && exports[key] === _selectors[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _selectors[key];
-    }
-  });
-});
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { "default": e }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
@@ -58,18 +45,6 @@ var INITIAL_STATE = {
 };
 var mergeResult = function mergeResult(state, resp) {
   if (!resp.data) return state;
-  var _mergeDeep = function mergeDeep(target, source) {
-    for (var key in source) {
-      if (Array.isArray(source[key])) {
-        target[key] = source[key];
-      } else if (source[key] instanceof Object) {
-        if (!target[key]) target[key] = {};
-        _mergeDeep(target[key], source[key]);
-      } else {
-        target[key] = source[key];
-      }
-    }
-  };
   var records = Array.isArray(resp.data) ? resp.data : [resp.data];
   var newState = _objectSpread({}, state);
   records.forEach(function (record) {
@@ -83,7 +58,7 @@ var mergeResult = function mergeResult(state, resp) {
         attributes: {}
       };
     }
-    _mergeDeep(newState[record.type][record.id].attributes, record.attributes);
+    (0, _deepmerge["default"])([record.type][record.id].attributes, record.attributes);
   });
   return newState;
 };

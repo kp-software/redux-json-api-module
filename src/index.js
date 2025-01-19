@@ -1,6 +1,7 @@
 import qs from 'qs';
+import merge from 'deepmerge';
 
-export * from './selectors';
+export { getRecord, getRelationship } from './selectors';
 
 export const CLEAR_RECORDS = 'redux-json-api-module/api/CLEAR_RECORDS';
 export const FETCH_RECORDS = 'redux-json-api-module/api/FETCH_RECORDS';
@@ -17,19 +18,6 @@ const INITIAL_STATE = {
 const mergeResult = (state, resp) => {
   if (!resp.data) return state;
 
-  const mergeDeep = (target, source) => {
-    for (const key in source) {
-      if (Array.isArray(source[key])) {
-        target[key] = source[key];
-      } else if (source[key] instanceof Object) {
-        if (!target[key]) target[key] = {};
-        mergeDeep(target[key], source[key]);
-      } else {
-        target[key] = source[key];
-      }
-    }
-  };
-
   const records = Array.isArray(resp.data) ? resp.data : [resp.data];
   const newState = { ...state };
 
@@ -42,7 +30,7 @@ const mergeResult = (state, resp) => {
       newState[record.type][record.id] = { type: record.type, id: record.id, attributes: {} };
     }
 
-    mergeDeep(newState[record.type][record.id].attributes, record.attributes);
+    merge([record.type][record.id].attributes, record.attributes);
   });
 
   return newState;
