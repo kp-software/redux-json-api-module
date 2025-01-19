@@ -26,6 +26,11 @@ const resultMerge = (state, resp) => {
   const newState = { ...state };
 
   records.forEach(record => {
+    if (!record || !record.type || !record.id || !record.attributes) {
+      console.error('Invalid record', record);
+      return;
+    }
+
     if (!newState[record.type]) {
       newState[record.type] = {};
     }
@@ -34,7 +39,7 @@ const resultMerge = (state, resp) => {
       newState[record.type][record.id] = { type: record.type, id: record.id, attributes: {} };
     }
 
-    merge(
+    newState[record.type][record.id].attributes = merge(
       newState[record.type][record.id].attributes,
       record.attributes,
       { arrayMerge }

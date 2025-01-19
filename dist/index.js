@@ -56,6 +56,10 @@ var resultMerge = function resultMerge(state, resp) {
   var records = Array.isArray(normalizedResp.data) ? normalizedResp.data : [normalizedResp.data];
   var newState = _objectSpread({}, state);
   records.forEach(function (record) {
+    if (!record || !record.type || !record.id || !record.attributes) {
+      console.error('Invalid record', record);
+      return;
+    }
     if (!newState[record.type]) {
       newState[record.type] = {};
     }
@@ -66,7 +70,7 @@ var resultMerge = function resultMerge(state, resp) {
         attributes: {}
       };
     }
-    (0, _deepmerge["default"])(newState[record.type][record.id].attributes, record.attributes, {
+    newState[record.type][record.id].attributes = (0, _deepmerge["default"])(newState[record.type][record.id].attributes, record.attributes, {
       arrayMerge: arrayMerge
     });
   });
