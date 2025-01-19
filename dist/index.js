@@ -53,6 +53,7 @@ var resultMerge = function resultMerge(state, resp) {
     camelizeKeys: false,
     camelizeTypeValues: false
   });
+  console.debug('Normalized Response:', normalizedResp);
   var records = Array.isArray(normalizedResp.data) ? normalizedResp.data : [normalizedResp.data];
   var newState = _objectSpread({}, state);
   records.forEach(function (record) {
