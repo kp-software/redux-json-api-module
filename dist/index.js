@@ -59,10 +59,6 @@ var INITIAL_STATE = {
 };
 var mergeResult = function mergeResult(state, resp) {
   if (!resp.data) return state;
-  var normalizedData = (0, _jsonApiNormalizer["default"])(resp, {
-    camelizeKeys: false,
-    camelizeTypeValues: false
-  });
   var _mergeDeep = function mergeDeep(target, source) {
     for (var key in source) {
       if (source[key] instanceof Object) {
@@ -73,17 +69,19 @@ var mergeResult = function mergeResult(state, resp) {
       }
     }
   };
+  var records = Array.isArray(resp.data) ? resp.data : [resp.data];
   var newState = _objectSpread({}, state);
-  Object.keys(normalizedData).forEach(function (recordType) {
-    if (!newState[recordType]) {
-      newState[recordType] = {};
+  records.forEach(function (record) {
+    if (!newState[record.type]) {
+      newState[record.type] = {};
     }
-    Object.keys(normalizedData[recordType]).forEach(function (recordId) {
-      if (!newState[recordType][recordId]) {
-        newState[recordType][recordId] = {};
-      }
-      _mergeDeep(newState[recordType][recordId], normalizedData[recordType][recordId]);
+    var normalizedRecord = (0, _jsonApiNormalizer["default"])(record, {
+      camelizeKeys: false,
+      camelizeTypeValues: false
     });
+    console.log('record: ', record);
+    console.log('normalizedRecord: ', normalizedRecord);
+    _mergeDeep(newState[record.type][record.id] || {}, normalizedRecord);
   });
   return newState;
 };
