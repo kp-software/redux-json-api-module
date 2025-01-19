@@ -37,10 +37,7 @@ const mergeResult = (state, resp) => {
       newState[record.type] = {};
     }
 
-    const normalizedRecord = normalize(record, { camelizeKeys: false, camelizeTypeValues: false });
-    console.log('record: ', record);
-    console.log('normalizedRecord: ', normalizedRecord);
-    mergeDeep(newState[record.type][record.id] || {}, normalizedRecord);
+    mergeDeep(newState[record.type][record.id] || {}, record);
   })
 
   return newState;

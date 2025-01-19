@@ -75,13 +75,7 @@ var mergeResult = function mergeResult(state, resp) {
     if (!newState[record.type]) {
       newState[record.type] = {};
     }
-    var normalizedRecord = (0, _jsonApiNormalizer["default"])(record, {
-      camelizeKeys: false,
-      camelizeTypeValues: false
-    });
-    console.log('record: ', record);
-    console.log('normalizedRecord: ', normalizedRecord);
-    _mergeDeep(newState[record.type][record.id] || {}, normalizedRecord);
+    _mergeDeep(newState[record.type][record.id] || {}, record);
   });
   return newState;
 };
