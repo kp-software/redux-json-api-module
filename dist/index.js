@@ -24,6 +24,7 @@ Object.defineProperty(exports, "getRelationship", {
 exports.queryString = void 0;
 exports.saveRecord = saveRecord;
 var _qs = _interopRequireDefault(require("qs"));
+var _jsonApiNormalizer = _interopRequireDefault(require("json-api-normalizer"));
 var _deepmerge = _interopRequireDefault(require("deepmerge"));
 var _selectors = require("./selectors");
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { "default": e }; }
@@ -43,9 +44,16 @@ var DELETE_RECORD_FAIL = exports.DELETE_RECORD_FAIL = 'redux-json-api-module/api
 var INITIAL_STATE = {
   loading: false
 };
-var mergeResult = function mergeResult(state, resp) {
+var arrayMerge = function arrayMerge(a, b) {
+  return b;
+};
+var resultMerge = function resultMerge(state, resp) {
   if (!resp.data) return state;
-  var records = Array.isArray(resp.data) ? resp.data : [resp.data];
+  var normalizedResp = (0, _jsonApiNormalizer["default"])(resp, {
+    camelizeKeys: false,
+    camelizeTypeValues: false
+  });
+  var records = Array.isArray(normalizedResp.data) ? normalizedResp.data : [normalizedResp.data];
   var newState = _objectSpread({}, state);
   records.forEach(function (record) {
     if (!newState[record.type]) {
@@ -58,7 +66,9 @@ var mergeResult = function mergeResult(state, resp) {
         attributes: {}
       };
     }
-    (0, _deepmerge["default"])([record.type][record.id].attributes, record.attributes);
+    (0, _deepmerge["default"])(newState[record.type][record.id].attributes, record.attributes, {
+      arrayMerge: arrayMerge
+    });
   });
   return newState;
 };
@@ -69,15 +79,15 @@ function reducer() {
     case CLEAR_RECORDS:
       return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, action.record_type, {}));
     case FETCH_RECORDS_SUCCESS:
-      return mergeResult(state, action.payload.data);
+      return resultMerge(state, action.payload.data);
     case SAVE_RECORD_SUCCESS:
-      return mergeResult(state, action.payload.data);
+      return resultMerge(state, action.payload.data);
     case DELETE_RECORD:
       var recs = _objectSpread({}, state[action.record.type]);
       delete recs[action.record.id];
       return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, action.record.type, recs));
     case DELETE_RECORD_FAIL:
-      return mergeResult(state, {
+      return resultMerge(state, {
         data: action.meta.previousAction.record
       });
     default:

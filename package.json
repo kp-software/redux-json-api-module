@@ -25,7 +25,7 @@
   "homepage": "https://github.com/kp-software/redux-json-api-module#readme",
   "dependencies": {
     "deepmerge": "^4.3.1",
-    "json-api-normalizer": "^0.4.15",
+    "json-api-normalizer": "^1.0.4",
     "qs": "^6.10.3"
   },
   "devDependencies": {

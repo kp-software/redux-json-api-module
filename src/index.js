@@ -1,4 +1,5 @@
 import qs from 'qs';
+import normalize from 'json-api-normalizer';
 import merge from 'deepmerge';
 
 export { getRecord, getRelationship } from './selectors';
@@ -15,10 +16,13 @@ const INITIAL_STATE = {
   loading: false,
 };
 
-const mergeResult = (state, resp) => {
+const arrayMerge = (a, b) => b;
+
+const resultMerge = (state, resp) => {
   if (!resp.data) return state;
 
-  const records = Array.isArray(resp.data) ? resp.data : [resp.data];
+  const normalizedResp = normalize(resp, { camelizeKeys: false, camelizeTypeValues: false });
+  const records = Array.isArray(normalizedResp.data) ? normalizedResp.data : [normalizedResp.data];
   const newState = { ...state };
 
   records.forEach(record => {
@@ -30,7 +34,11 @@ const mergeResult = (state, resp) => {
       newState[record.type][record.id] = { type: record.type, id: record.id, attributes: {} };
     }
 
-    merge([record.type][record.id].attributes, record.attributes);
+    merge(
+      newState[record.type][record.id].attributes,
+      record.attributes,
+      { arrayMerge }
+    );
   });
 
   return newState;
@@ -42,10 +50,10 @@ export default function reducer(state = INITIAL_STATE, action) {
       return { ...state, [action.record_type]: {} };
 
     case FETCH_RECORDS_SUCCESS:
-      return mergeResult(state, action.payload.data);
+      return resultMerge(state, action.payload.data);
 
     case SAVE_RECORD_SUCCESS:
-      return mergeResult(state, action.payload.data);
+      return resultMerge(state, action.payload.data);
 
     case DELETE_RECORD:
       const recs = { ...state[action.record.type] };
@@ -54,7 +62,7 @@ export default function reducer(state = INITIAL_STATE, action) {
       return { ...state, [action.record.type]: recs };
 
     case DELETE_RECORD_FAIL:
-      return mergeResult(state, { data: action.meta.previousAction.record });
+      return resultMerge(state, { data: action.meta.previousAction.record });
 
     default:
       return state;
