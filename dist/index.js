@@ -49,7 +49,8 @@ var arrayMerge = function arrayMerge(a, b) {
 };
 var resultMerge = function resultMerge(state, resp) {
   if (!resp.data) return state;
-  var normalizedResp = (0, _jsonApiNormalizer["default"])(resp, {
+  console.debug('Response:', resp);
+  var normalizedResp = (0, _jsonApiNormalizer["default"])(resp.data, {
     camelizeKeys: false,
     camelizeTypeValues: false
   });

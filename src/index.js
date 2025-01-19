@@ -20,8 +20,9 @@ const arrayMerge = (a, b) => b;
 
 const resultMerge = (state, resp) => {
   if (!resp.data) return state;
+  console.debug('Response:', resp);
 
-  const normalizedResp = normalize(resp, { camelizeKeys: false, camelizeTypeValues: false });
+  const normalizedResp = normalize(resp.data, { camelizeKeys: false, camelizeTypeValues: false });
   console.debug('Normalized Response:', normalizedResp);
 
   const records = Array.isArray(normalizedResp.data) ? normalizedResp.data : [normalizedResp.data];
