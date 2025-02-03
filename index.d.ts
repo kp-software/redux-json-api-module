@@ -15,7 +15,7 @@ declare module 'redux-json-api-module' {
     export const clearRecords: (type: string) => void;
     export const getRecord: (state: any, { type, id }: { type: string; id: number }) => any;
     export const fetchRecords: (type: string, params?: object) => Promise<any>;
-    export const fetchRecord: (record: ApiRecord, id: any, params?: object) => Promise<any>;
+    export const fetchRecord: (type: string , id: any, params?: object) => Promise<any>;
     export const saveRecord: (record: ApiRecord, params?: object) => Promise<any>;
     export const deleteRecord: (record: ApiRecord) => Promise<any>;
     export const getRelationship: (state: any, relationship: any) => any;
