@@ -1,6 +1,6 @@
 declare module 'redux-json-api-module' {
     export type ApiRecord = {
-        id: number;
+        id?: number;
         type: string;
         attributes: any;
     }
