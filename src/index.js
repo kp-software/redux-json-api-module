@@ -1,6 +1,7 @@
 import qs from 'qs';
 import normalize from 'json-api-normalizer';
 import merge from 'deepmerge';
+import produce from 'immer';
 
 export { getRecord, getRelationship } from './selectors';
 
@@ -21,14 +22,11 @@ const arrayMerge = (a, b) => b;
 const resultMerge = (state, resp) => {
   if (!resp.data) return state;
 
-  const newState = { ...state };
   const normalizedResp = normalize(resp, { camelizeKeys: false, camelizeTypeValues: false });
 
-  return merge(
-    newState,
-    normalizedResp,
-    { arrayMerge }
-  )
+  return produce(state, draft => {
+    Object.assign(draft, merge(draft, normalizedResp, { arrayMerge }));
+  });
 };
 
 export default function reducer(state = INITIAL_STATE, action) {

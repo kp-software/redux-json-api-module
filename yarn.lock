@@ -1950,6 +1950,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"immer@npm:^10.1.1":
+  version: 10.1.1
+  resolution: "immer@npm:10.1.1"
+  checksum: 10c0/b749e10d137ccae91788f41bd57e9387f32ea6d6ea8fd7eb47b23fd7766681575efc7f86ceef7fe24c3bc9d61e38ff5d2f49c2663b2b0c056e280a4510923653
+  languageName: node
+  linkType: hard
+
 "imurmurhash@npm:^0.1.4":
   version: 0.1.4
   resolution: "imurmurhash@npm:0.1.4"
@@ -2549,6 +2556,7 @@ __metadata:
     "@babel/preset-env": "npm:^7.5.5"
     babel-loader: "npm:^8.0.6"
     deepmerge: "npm:^4.3.1"
+    immer: "npm:^10.1.1"
     json-api-normalizer: "npm:^1.0.4"
     qs: "npm:^6.10.3"
   languageName: unknown
