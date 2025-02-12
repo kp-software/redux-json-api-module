@@ -1,4 +1,4 @@
-import type { ApiStore, ApiRecord, RecordSet, Relationship } from '../index.d';
+import type { ApiStore, ApiRecord, RecordSet, Relationship } from '../index';
 
 const emptyRecords: RecordSet = {};
 

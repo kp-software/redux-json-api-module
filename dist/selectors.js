@@ -17,9 +17,12 @@ var getRelationship = function (api, relationship) {
         return null;
     if (Array.isArray(relationship.data)) {
         return relationship.data
-            .map(function (rel) { return rel.id !== undefined ? (0, exports.getRecord)(api, rel) : null; })
+            .map(function (rel) { return rel.id !== undefined ? (0, exports.getRecord)(api, { type: rel.type, id: rel.id }) : null; })
             .filter(function (rel) { return rel; });
     }
-    return relationship.data.id !== undefined ? (0, exports.getRecord)(api, relationship.data) : null;
+    if (relationship.data.id !== undefined) {
+        return (0, exports.getRecord)(api, { type: relationship.data.type, id: relationship.data.id });
+    }
+    return null;
 };
 exports.getRelationship = getRelationship;
