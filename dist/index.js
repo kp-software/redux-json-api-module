@@ -52,15 +52,15 @@ function reducer(state, action) {
         case exports.CLEAR_RECORDS:
             return __assign(__assign({}, state), (_a = {}, _a[action.record_type] = {}, _a));
         case exports.FETCH_RECORDS_SUCCESS:
-            return resultMerge(state, action.payload.data).merge({ loading: false });
+            return Object.assign(resultMerge(state, action.payload.data), { loading: false });
         case exports.SAVE_RECORD_SUCCESS:
-            return resultMerge(state, action.payload.data).merge({ loading: false });
+            return Object.assign(resultMerge(state, action.payload.data), { loading: false });
         case exports.DELETE_RECORD:
             var recs = __assign({}, state[action.record.type]);
             delete recs[action.record.id];
             return __assign(__assign({}, state), (_b = {}, _b[action.record.type] = recs, _b));
         case exports.DELETE_RECORD_FAIL:
-            return resultMerge(state, { data: action.meta.previousAction.record }).merge({ loading: false });
+            return Object.assign(resultMerge(state, { data: action.meta.previousAction.record }), { loading: false });
         default:
             return state;
     }

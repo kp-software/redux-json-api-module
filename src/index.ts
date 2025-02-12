@@ -44,10 +44,10 @@ export default function reducer(state: State = INITIAL_STATE, action: Action & {
       return { ...state, [action.record_type]: {} };
 
     case FETCH_RECORDS_SUCCESS:
-      return resultMerge(state, action.payload.data).merge({ loading: false });
+      return Object.assign(resultMerge(state, action.payload.data), { loading: false })
 
     case SAVE_RECORD_SUCCESS:
-      return resultMerge(state, action.payload.data).merge({ loading: false });
+      return Object.assign(resultMerge(state, action.payload.data), { loading: false });
 
     case DELETE_RECORD:
       const recs = { ...state[action.record.type] };
@@ -56,7 +56,7 @@ export default function reducer(state: State = INITIAL_STATE, action: Action & {
       return { ...state, [action.record.type]: recs };
 
     case DELETE_RECORD_FAIL:
-      return resultMerge(state, { data: action.meta.previousAction.record }).merge({ loading: false });
+      return Object.assign(resultMerge(state, { data: action.meta.previousAction.record }), { loading: false });
 
     default:
       return state;
