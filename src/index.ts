@@ -1,7 +1,8 @@
 import qs from 'qs';
 import normalize from 'json-api-normalizer';
 import merge from 'deepmerge';
-import produce from 'immer';
+import { Action } from 'redux';
+import type { ApiRecord } from '../index.d';
 
 export { getRecord, getRelationship } from './selectors';
 
@@ -13,32 +14,40 @@ export const SAVE_RECORD_SUCCESS = 'redux-json-api-module/api/SAVE_RECORD_SUCCES
 export const DELETE_RECORD = 'redux-json-api-module/api/DELETE_RECORD';
 export const DELETE_RECORD_FAIL = 'redux-json-api-module/api/DELETE_RECORD_FAIL';
 
-const INITIAL_STATE = {
+interface State {
+  loading: boolean;
+  [key: string]: any;
+}
+
+const INITIAL_STATE: State = {
   loading: false,
 };
 
-const arrayMerge = (a, b) => b;
+const arrayMerge = (a: any[], b: any[]) => b;
 
-const resultMerge = (state, resp) => {
+const resultMerge = (state: State, resp: any) => {
   if (!resp.data) return state;
 
+  const newState = { ...state };
   const normalizedResp = normalize(resp, { camelizeKeys: false, camelizeTypeValues: false });
 
-  return produce(state, draft => {
-    Object.assign(draft, merge(draft, normalizedResp, { arrayMerge }));
-  });
+  return merge(
+    newState,
+    normalizedResp,
+    { arrayMerge }
+  );
 };
 
-export default function reducer(state = INITIAL_STATE, action) {
+export default function reducer(state: State = INITIAL_STATE, action: Action & { [key: string]: any }): State {
   switch (action.type) {
     case CLEAR_RECORDS:
       return { ...state, [action.record_type]: {} };
 
     case FETCH_RECORDS_SUCCESS:
-      return resultMerge(state, action.payload.data);
+      return resultMerge(state, action.payload.data).merge({ loading: false });
 
     case SAVE_RECORD_SUCCESS:
-      return resultMerge(state, action.payload.data);
+      return resultMerge(state, action.payload.data).merge({ loading: false });
 
     case DELETE_RECORD:
       const recs = { ...state[action.record.type] };
@@ -47,23 +56,23 @@ export default function reducer(state = INITIAL_STATE, action) {
       return { ...state, [action.record.type]: recs };
 
     case DELETE_RECORD_FAIL:
-      return resultMerge(state, { data: action.meta.previousAction.record });
+      return resultMerge(state, { data: action.meta.previousAction.record }).merge({ loading: false });
 
     default:
       return state;
   }
 }
 
-export const queryString = params => qs.stringify(params, { arrayFormat: 'brackets' });
+export const queryString = (params: any) => qs.stringify(params, { arrayFormat: 'brackets' });
 
-export function clearRecords(type) {
+export function clearRecords(type: string): object {
   return {
     type: CLEAR_RECORDS,
     record_type: type,
   };
 }
 
-export function fetchRecords(type, params = {}) {
+export function fetchRecords(type: string, params: object = {}): object {
   return {
     type: FETCH_RECORDS,
     payload: {
@@ -75,7 +84,7 @@ export function fetchRecords(type, params = {}) {
   };
 }
 
-export function fetchRecord(type, id, params = {}) {
+export function fetchRecord(type: string, id: any, params: object = {}): object {
   return {
     type: FETCH_RECORDS,
     payload: {
@@ -87,7 +96,7 @@ export function fetchRecord(type, id, params = {}) {
   };
 }
 
-export function saveRecord(record, options = {}) {
+export function saveRecord(record: ApiRecord, options: { ignoreFail?: boolean; params?: object } = {}): object {
   console.info('saving record', record, options);
 
   const method = record.id ? 'PATCH' : 'POST';
@@ -108,7 +117,7 @@ export function saveRecord(record, options = {}) {
   };
 }
 
-export function deleteRecord(record) {
+export function deleteRecord(record: ApiRecord): object {
   return {
     type: DELETE_RECORD,
     record,
