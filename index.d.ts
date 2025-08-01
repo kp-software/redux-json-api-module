@@ -1,7 +1,7 @@
 import { Action } from 'redux';
 
 export type ApiRecord = {
-    id?: string | number;
+    id: string | number | null;
     type: string;
     attributes: any;
 };
@@ -30,6 +30,6 @@ export const getRecord: (state: any, { type, id }: { type: string; id: number })
 export const fetchRecords: (type: string, params?: object) => Promise<any>;
 export const fetchRecord: (type: string , id: any, params?: object) => Promise<any>;
 export const saveRecord: (record: ApiRecord, params?: object) => Promise<any>;
-export const deleteRecord: (record: ApiRecord) => Promise<any>;
+export const deleteRecord: (record: { type: string, id: string | number }) => Promise<any>;
 export const getRelationship: (state: any, relationship: any) => any;
 export const queryString: (params: any) => string;
