@@ -1,1 +1,6 @@
 src
+.idea
+.claude
+.github
+.yarn
+vitest.config.ts
