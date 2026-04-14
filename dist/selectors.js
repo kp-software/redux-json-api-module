@@ -11,7 +11,7 @@ const getRelationship = (api, relationship) => {
         return null;
     if (Array.isArray(relationship.data)) {
         return relationship.data
-            .map((rel) => rel.id !== undefined ? (0, exports.getRecord)(api, { type: rel.type, id: rel.id }) : null)
+            .map((rel) => rel.id != null ? (0, exports.getRecord)(api, { type: rel.type, id: rel.id }) : null)
             .filter((rel) => rel);
     }
     if (relationship.data.id !== undefined) {

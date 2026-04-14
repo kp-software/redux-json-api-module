@@ -25,11 +25,21 @@ const INITIAL_STATE: State = {
 
 const arrayMerge = (a: any[], b: any[]) => b;
 
-const resultMerge = (state: State, resp: any) => {
+const resultMerge = (state: State, resp: any, replace: boolean = false) => {
   if (!resp.data) return state;
 
   const newState = { ...state };
   const normalizedResp = normalize(resp);
+
+  if (replace) {
+    for (const type of Object.keys(normalizedResp)) {
+      newState[type] = {
+        ...newState[type],
+        ...normalizedResp[type],
+      };
+    }
+    return newState;
+  }
 
   return merge(
     newState,
@@ -44,10 +54,10 @@ export default function reducer(state: State = INITIAL_STATE, action: Action & {
       return { ...state, [action.record_type]: {} };
 
     case FETCH_RECORDS_SUCCESS:
-      return Object.assign(resultMerge(state, action.payload.data), { loading: false })
+      return Object.assign(resultMerge(state, action.payload.data, action.meta?.previousAction?.replace), { loading: false })
 
     case SAVE_RECORD_SUCCESS:
-      return Object.assign(resultMerge(state, action.payload.data), { loading: false });
+      return Object.assign(resultMerge(state, action.payload.data, action.meta?.previousAction?.replace), { loading: false });
 
     case DELETE_RECORD:
       const recs = { ...state[action.record.type] };
@@ -72,9 +82,10 @@ export function clearRecords(type: string): object {
   };
 }
 
-export function fetchRecords(type: string, params: object = {}): object {
+export function fetchRecords(type: string, params: object = {}, options: { replace?: boolean } = {}): object {
   return {
     type: FETCH_RECORDS,
+    ...(options.replace ? { replace: true } : {}),
     payload: {
       request: {
         method: 'GET',
@@ -84,9 +95,10 @@ export function fetchRecords(type: string, params: object = {}): object {
   };
 }
 
-export function fetchRecord(type: string, id: any, params: object = {}): object {
+export function fetchRecord(type: string, id: any, params: object = {}, options: { replace?: boolean } = {}): object {
   return {
     type: FETCH_RECORDS,
+    ...(options.replace ? { replace: true } : {}),
     payload: {
       request: {
         method: 'GET',
@@ -96,7 +108,7 @@ export function fetchRecord(type: string, id: any, params: object = {}): object 
   };
 }
 
-export function saveRecord(record: ApiRecord, options: { ignoreFail?: boolean; params?: object } = {}): object {
+export function saveRecord(record: ApiRecord, options: { ignoreFail?: boolean; params?: object; replace?: boolean } = {}): object {
   console.info('saving record', record, options);
 
   const method = record.id ? 'PATCH' : 'POST';
@@ -107,6 +119,7 @@ export function saveRecord(record: ApiRecord, options: { ignoreFail?: boolean; p
   return {
     type: SAVE_RECORD,
     ignoreFail: options.ignoreFail,
+    ...(options.replace ? { replace: true } : {}),
     payload: {
       request: {
         method,

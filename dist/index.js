@@ -27,21 +27,28 @@ const INITIAL_STATE = {
     loading: false,
 };
 const arrayMerge = (a, b) => b;
-const resultMerge = (state, resp) => {
+const resultMerge = (state, resp, replace = false) => {
     if (!resp.data)
         return state;
     const newState = Object.assign({}, state);
     const normalizedResp = (0, normalize_1.default)(resp);
+    if (replace) {
+        for (const type of Object.keys(normalizedResp)) {
+            newState[type] = Object.assign(Object.assign({}, newState[type]), normalizedResp[type]);
+        }
+        return newState;
+    }
     return (0, deepmerge_1.default)(newState, normalizedResp, { arrayMerge });
 };
 function reducer(state = INITIAL_STATE, action) {
+    var _a, _b, _c, _d;
     switch (action.type) {
         case exports.CLEAR_RECORDS:
             return Object.assign(Object.assign({}, state), { [action.record_type]: {} });
         case exports.FETCH_RECORDS_SUCCESS:
-            return Object.assign(resultMerge(state, action.payload.data), { loading: false });
+            return Object.assign(resultMerge(state, action.payload.data, (_b = (_a = action.meta) === null || _a === void 0 ? void 0 : _a.previousAction) === null || _b === void 0 ? void 0 : _b.replace), { loading: false });
         case exports.SAVE_RECORD_SUCCESS:
-            return Object.assign(resultMerge(state, action.payload.data), { loading: false });
+            return Object.assign(resultMerge(state, action.payload.data, (_d = (_c = action.meta) === null || _c === void 0 ? void 0 : _c.previousAction) === null || _d === void 0 ? void 0 : _d.replace), { loading: false });
         case exports.DELETE_RECORD:
             const recs = Object.assign({}, state[action.record.type]);
             delete recs[action.record.id];
@@ -60,27 +67,21 @@ function clearRecords(type) {
         record_type: type,
     };
 }
-function fetchRecords(type, params = {}) {
-    return {
-        type: exports.FETCH_RECORDS,
-        payload: {
+function fetchRecords(type, params = {}, options = {}) {
+    return Object.assign(Object.assign({ type: exports.FETCH_RECORDS }, (options.replace ? { replace: true } : {})), { payload: {
             request: {
                 method: 'GET',
                 url: `/${type}?${(0, exports.queryString)(params)}`,
             },
-        },
-    };
+        } });
 }
-function fetchRecord(type, id, params = {}) {
-    return {
-        type: exports.FETCH_RECORDS,
-        payload: {
+function fetchRecord(type, id, params = {}, options = {}) {
+    return Object.assign(Object.assign({ type: exports.FETCH_RECORDS }, (options.replace ? { replace: true } : {})), { payload: {
             request: {
                 method: 'GET',
                 url: `/${type}/${id}?${(0, exports.queryString)(params)}`,
             },
-        },
-    };
+        } });
 }
 function saveRecord(record, options = {}) {
     console.info('saving record', record, options);
@@ -88,17 +89,13 @@ function saveRecord(record, options = {}) {
     let url = `/${record.type}`;
     if (record.id)
         url += `/${record.id}`;
-    return {
-        type: exports.SAVE_RECORD,
-        ignoreFail: options.ignoreFail,
-        payload: {
+    return Object.assign(Object.assign({ type: exports.SAVE_RECORD, ignoreFail: options.ignoreFail }, (options.replace ? { replace: true } : {})), { payload: {
             request: {
                 method,
                 url: `${url}?${(0, exports.queryString)(options.params || {})}`,
                 data: { data: record },
             },
-        },
-    };
+        } });
 }
 function deleteRecord(record) {
     return {

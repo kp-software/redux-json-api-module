@@ -13,12 +13,12 @@ export const getRelationship = (api: ApiStore, relationship: Relationship) => {
 
   if (Array.isArray(relationship.data)) {
     return relationship.data
-        .map((rel: ApiRecord) => rel.id !== undefined ? getRecord(api, { type: rel.type, id: rel.id }) : null)
+        .map((rel: ApiRecord) => rel.id != null ? getRecord(api, { type: rel.type, id: rel.id as string | number }) : null)
         .filter((rel: ApiRecord | null) => rel);
   }
 
   if (relationship.data.id !== undefined){
-     return getRecord(api, { type: relationship.data.type, id: relationship.data.id })
+     return getRecord(api, { type: relationship.data.type, id: relationship.data.id as string | number })
   }
 
   return null

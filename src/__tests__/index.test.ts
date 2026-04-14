@@ -104,6 +104,21 @@ describe('fetchRecords', () => {
     const action = fetchRecords('articles') as any;
     expect(action.payload.request.url).toMatch(/\/articles\?$/);
   });
+
+  it('sets replace on action when options.replace is true', () => {
+    const action = fetchRecords('articles', {}, { replace: true }) as any;
+    expect(action.replace).toBe(true);
+  });
+
+  it('does not set replace on action when options not provided', () => {
+    const action = fetchRecords('articles') as any;
+    expect(action.replace).toBeUndefined();
+  });
+
+  it('does not set replace on action when options.replace is false', () => {
+    const action = fetchRecords('articles', {}, { replace: false }) as any;
+    expect(action.replace).toBeUndefined();
+  });
 });
 
 describe('fetchRecord', () => {
@@ -117,6 +132,16 @@ describe('fetchRecord', () => {
   it('appends query string from params', () => {
     const action = fetchRecord('articles', 5, { include: 'author' }) as any;
     expect(action.payload.request.url).toBe('/articles/5?include=author');
+  });
+
+  it('sets replace on action when options.replace is true', () => {
+    const action = fetchRecord('articles', 5, {}, { replace: true }) as any;
+    expect(action.replace).toBe(true);
+  });
+
+  it('does not set replace on action when options not provided', () => {
+    const action = fetchRecord('articles', 5) as any;
+    expect(action.replace).toBeUndefined();
   });
 });
 
@@ -181,6 +206,18 @@ describe('saveRecord', () => {
     const action = saveRecord(record) as any;
 
     expect(action.type).toBe(SAVE_RECORD);
+  });
+
+  it('sets replace on action when options.replace is true', () => {
+    const record = { id: '1', type: 'articles', attributes: {} };
+    const action = saveRecord(record, { replace: true }) as any;
+    expect(action.replace).toBe(true);
+  });
+
+  it('does not set replace on action when replace not in options', () => {
+    const record = { id: '1', type: 'articles', attributes: {} };
+    const action = saveRecord(record, { ignoreFail: true }) as any;
+    expect(action.replace).toBeUndefined();
   });
 });
 
@@ -328,6 +365,134 @@ describe('reducer', () => {
       expect(state.articles['1']).toBeDefined();
       expect(state.people['10'].attributes.name).toBe('Dan');
     });
+
+    it('replaces individual records instead of deep merging when replace is true', () => {
+      const initial = {
+        loading: true,
+        articles: {
+          '1': {
+            id: '1',
+            type: 'articles',
+            attributes: { title: 'Old Title', body: 'Old Body' },
+          },
+        },
+      };
+      const action = {
+        type: FETCH_RECORDS_SUCCESS,
+        meta: { previousAction: { replace: true } },
+        payload: {
+          data: {
+            data: [
+              { id: '1', type: 'articles', attributes: { title: 'New Title' } },
+            ],
+          },
+        },
+      };
+
+      const state = reducer(initial, action);
+      expect(state.articles['1'].attributes.title).toBe('New Title');
+      expect(state.articles['1'].attributes.body).toBeUndefined();
+    });
+
+    it('preserves records not in the response when replace is true', () => {
+      const initial = {
+        loading: true,
+        articles: {
+          '1': { id: '1', type: 'articles', attributes: { title: 'Stays' } },
+          '2': { id: '2', type: 'articles', attributes: { title: 'Also stays' } },
+        },
+      };
+      const action = {
+        type: FETCH_RECORDS_SUCCESS,
+        meta: { previousAction: { replace: true } },
+        payload: {
+          data: {
+            data: [
+              { id: '1', type: 'articles', attributes: { title: 'Updated' } },
+            ],
+          },
+        },
+      };
+
+      const state = reducer(initial, action);
+      expect(state.articles['1'].attributes.title).toBe('Updated');
+      expect(state.articles['2'].attributes.title).toBe('Also stays');
+    });
+
+    it('still deep merges by default when replace is not set', () => {
+      const initial = {
+        loading: true,
+        articles: {
+          '1': {
+            id: '1',
+            type: 'articles',
+            attributes: { title: 'Old', body: 'Preserved' },
+          },
+        },
+      };
+      const action = {
+        type: FETCH_RECORDS_SUCCESS,
+        payload: {
+          data: {
+            data: [
+              { id: '1', type: 'articles', attributes: { title: 'New' } },
+            ],
+          },
+        },
+      };
+
+      const state = reducer(initial, action);
+      expect(state.articles['1'].attributes.title).toBe('New');
+      expect(state.articles['1'].attributes.body).toBe('Preserved');
+    });
+
+    it('handles replace with included resources', () => {
+      const initial = {
+        loading: true,
+        people: {
+          '10': { id: '10', type: 'people', attributes: { name: 'Old', age: 30 } },
+        },
+      };
+      const action = {
+        type: FETCH_RECORDS_SUCCESS,
+        meta: { previousAction: { replace: true } },
+        payload: {
+          data: {
+            data: [{ id: '1', type: 'articles', attributes: { title: 'A' } }],
+            included: [{ id: '10', type: 'people', attributes: { name: 'New' } }],
+          },
+        },
+      };
+
+      const state = reducer(initial, action);
+      expect(state.people['10'].attributes.name).toBe('New');
+      expect(state.people['10'].attributes.age).toBeUndefined();
+    });
+
+    it('preserves other resource types not in the response when replace is true', () => {
+      const initial = {
+        loading: true,
+        articles: {
+          '1': { id: '1', type: 'articles', attributes: { title: 'Existing' } },
+        },
+        people: {
+          '10': { id: '10', type: 'people', attributes: { name: 'Dan' } },
+        },
+      };
+      const action = {
+        type: FETCH_RECORDS_SUCCESS,
+        meta: { previousAction: { replace: true } },
+        payload: {
+          data: {
+            data: [{ id: '1', type: 'articles', attributes: { title: 'Updated' } }],
+          },
+        },
+      };
+
+      const state = reducer(initial, action);
+      expect(state.articles['1'].attributes.title).toBe('Updated');
+      expect(state.people['10'].attributes.name).toBe('Dan');
+    });
   });
 
   describe('SAVE_RECORD_SUCCESS', () => {
@@ -344,6 +509,57 @@ describe('reducer', () => {
       const state = reducer({ loading: true }, action);
       expect(state.articles['1'].attributes.title).toBe('Saved');
       expect(state.loading).toBe(false);
+    });
+
+    it('replaces record when replace is true', () => {
+      const initial = {
+        loading: true,
+        articles: {
+          '1': {
+            id: '1',
+            type: 'articles',
+            attributes: { title: 'Old', body: 'Should disappear' },
+          },
+        },
+      };
+      const action = {
+        type: SAVE_RECORD_SUCCESS,
+        meta: { previousAction: { replace: true } },
+        payload: {
+          data: {
+            data: { id: '1', type: 'articles', attributes: { title: 'Saved' } },
+          },
+        },
+      };
+
+      const state = reducer(initial, action);
+      expect(state.articles['1'].attributes.title).toBe('Saved');
+      expect(state.articles['1'].attributes.body).toBeUndefined();
+    });
+
+    it('deep merges saved record by default', () => {
+      const initial = {
+        loading: true,
+        articles: {
+          '1': {
+            id: '1',
+            type: 'articles',
+            attributes: { title: 'Old', body: 'Kept' },
+          },
+        },
+      };
+      const action = {
+        type: SAVE_RECORD_SUCCESS,
+        payload: {
+          data: {
+            data: { id: '1', type: 'articles', attributes: { title: 'New' } },
+          },
+        },
+      };
+
+      const state = reducer(initial, action);
+      expect(state.articles['1'].attributes.title).toBe('New');
+      expect(state.articles['1'].attributes.body).toBe('Kept');
     });
   });
 

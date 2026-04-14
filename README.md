@@ -4,6 +4,11 @@ Redux reducer, actions, action creators, and selectors for interacting with JSON
 
 ## Changelog
 
+### v2.2.0
+
+- Added `replace` option for `fetchRecords`, `fetchRecord`, and `saveRecord`. When `{ replace: true }`, response records fully overwrite their existing versions in the store instead of being deep-merged. Default behavior is unchanged.
+- Fixed `saveRecord` TypeScript definition to match implementation signature.
+
 ### v2.1.1
 
 - Added comprehensive test suite using Vitest (76 tests across normalize, selectors, and reducer/action creators).
@@ -59,6 +64,28 @@ applyMiddleware(
 
 NOTE: If you need to add auth headers or take action on api call request/response checkout 
 [redux-axios-middleware interceptors](https://github.com/svrcekmichal/redux-axios-middleware#interceptors)
+
+## Options
+
+### Replace Mode
+
+By default, records from API responses are deep-merged into the store. This means attributes not present in the response will be preserved from the existing record.
+
+If you want response records to fully replace their existing versions (e.g., when the server returns complete records and you want to discard stale local attributes), pass `{ replace: true }`:
+
+```js
+// Deep merge (default) -- existing attributes not in response are preserved
+fetchRecords('articles', { page: 1 });
+
+// Replace -- each returned record completely overwrites its existing version
+fetchRecords('articles', { page: 1 }, { replace: true });
+
+// Also works with fetchRecord and saveRecord
+fetchRecord('articles', 5, { include: 'author' }, { replace: true });
+saveRecord(record, { replace: true });
+```
+
+Records of the same type that are NOT in the response are always preserved regardless of the `replace` setting.
 
 ## Usage
 

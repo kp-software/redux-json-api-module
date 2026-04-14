@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-04-14
+### Added
+- `replace` option for `fetchRecords`, `fetchRecord`, and `saveRecord` action creators.
+  When `replace: true`, individual records from the API response completely overwrite
+  their existing versions in the store instead of being deep-merged. Records not in
+  the response are preserved. Default behavior (deep merge) is unchanged.
+
+### Fixed
+- Corrected `saveRecord` TypeScript definition to match implementation signature.
+- Fixed TypeScript compilation errors in selectors caused by nullable `ApiRecord.id`.
+
 ## Unreleased
 ### Added
 - TypeScript support
