@@ -4,6 +4,10 @@ Redux reducer, actions, action creators, and selectors for interacting with JSON
 
 ## Changelog
 
+### v2.1.1
+
+- Added comprehensive test suite using Vitest (76 tests across normalize, selectors, and reducer/action creators).
+
 ### v2.1.0
 
 - Replaced abandoned `json-api-normalizer` dependency with an inline implementation, removing transitive dependencies on `core-js` and `lodash` that contained security vulnerabilities.
