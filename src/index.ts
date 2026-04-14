@@ -1,5 +1,5 @@
 import qs from 'qs';
-import normalize from 'json-api-normalizer';
+import normalize from './normalize';
 import merge from 'deepmerge';
 import { Action } from 'redux';
 import type { ApiRecord } from '../index.d';
@@ -29,7 +29,7 @@ const resultMerge = (state: State, resp: any) => {
   if (!resp.data) return state;
 
   const newState = { ...state };
-  const normalizedResp = normalize(resp, { camelizeKeys: false, camelizeTypeValues: false });
+  const normalizedResp = normalize(resp);
 
   return merge(
     newState,

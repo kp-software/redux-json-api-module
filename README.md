@@ -2,6 +2,14 @@
 
 Redux reducer, actions, action creators, and selectors for interacting with JSON API.
 
+## Changelog
+
+### v2.1.0
+
+- Replaced abandoned `json-api-normalizer` dependency with an inline implementation, removing transitive dependencies on `core-js` and `lodash` that contained security vulnerabilities.
+- Updated all dependencies to latest versions for security patches.
+- Updated TypeScript compilation target from ES5 to ES2015.
+
 ## Install
 
 Add it to your reducers.

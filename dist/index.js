@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -21,9 +10,9 @@ exports.fetchRecords = fetchRecords;
 exports.fetchRecord = fetchRecord;
 exports.saveRecord = saveRecord;
 exports.deleteRecord = deleteRecord;
-var qs_1 = __importDefault(require("qs"));
-var json_api_normalizer_1 = __importDefault(require("json-api-normalizer"));
-var deepmerge_1 = __importDefault(require("deepmerge"));
+const qs_1 = __importDefault(require("qs"));
+const normalize_1 = __importDefault(require("./normalize"));
+const deepmerge_1 = __importDefault(require("deepmerge"));
 var selectors_1 = require("./selectors");
 Object.defineProperty(exports, "getRecord", { enumerable: true, get: function () { return selectors_1.getRecord; } });
 Object.defineProperty(exports, "getRelationship", { enumerable: true, get: function () { return selectors_1.getRelationship; } });
@@ -34,38 +23,36 @@ exports.SAVE_RECORD = 'redux-json-api-module/api/SAVE_RECORD';
 exports.SAVE_RECORD_SUCCESS = 'redux-json-api-module/api/SAVE_RECORD_SUCCESS';
 exports.DELETE_RECORD = 'redux-json-api-module/api/DELETE_RECORD';
 exports.DELETE_RECORD_FAIL = 'redux-json-api-module/api/DELETE_RECORD_FAIL';
-var INITIAL_STATE = {
+const INITIAL_STATE = {
     loading: false,
 };
-var arrayMerge = function (a, b) { return b; };
-var resultMerge = function (state, resp) {
+const arrayMerge = (a, b) => b;
+const resultMerge = (state, resp) => {
     if (!resp.data)
         return state;
-    var newState = __assign({}, state);
-    var normalizedResp = (0, json_api_normalizer_1.default)(resp, { camelizeKeys: false, camelizeTypeValues: false });
-    return (0, deepmerge_1.default)(newState, normalizedResp, { arrayMerge: arrayMerge });
+    const newState = Object.assign({}, state);
+    const normalizedResp = (0, normalize_1.default)(resp);
+    return (0, deepmerge_1.default)(newState, normalizedResp, { arrayMerge });
 };
-function reducer(state, action) {
-    var _a, _b;
-    if (state === void 0) { state = INITIAL_STATE; }
+function reducer(state = INITIAL_STATE, action) {
     switch (action.type) {
         case exports.CLEAR_RECORDS:
-            return __assign(__assign({}, state), (_a = {}, _a[action.record_type] = {}, _a));
+            return Object.assign(Object.assign({}, state), { [action.record_type]: {} });
         case exports.FETCH_RECORDS_SUCCESS:
             return Object.assign(resultMerge(state, action.payload.data), { loading: false });
         case exports.SAVE_RECORD_SUCCESS:
             return Object.assign(resultMerge(state, action.payload.data), { loading: false });
         case exports.DELETE_RECORD:
-            var recs = __assign({}, state[action.record.type]);
+            const recs = Object.assign({}, state[action.record.type]);
             delete recs[action.record.id];
-            return __assign(__assign({}, state), (_b = {}, _b[action.record.type] = recs, _b));
+            return Object.assign(Object.assign({}, state), { [action.record.type]: recs });
         case exports.DELETE_RECORD_FAIL:
             return Object.assign(resultMerge(state, { data: action.meta.previousAction.record }), { loading: false });
         default:
             return state;
     }
 }
-var queryString = function (params) { return qs_1.default.stringify(params, { arrayFormat: 'brackets' }); };
+const queryString = (params) => qs_1.default.stringify(params, { arrayFormat: 'brackets' });
 exports.queryString = queryString;
 function clearRecords(type) {
     return {
@@ -73,44 +60,41 @@ function clearRecords(type) {
         record_type: type,
     };
 }
-function fetchRecords(type, params) {
-    if (params === void 0) { params = {}; }
+function fetchRecords(type, params = {}) {
     return {
         type: exports.FETCH_RECORDS,
         payload: {
             request: {
                 method: 'GET',
-                url: "/".concat(type, "?").concat((0, exports.queryString)(params)),
+                url: `/${type}?${(0, exports.queryString)(params)}`,
             },
         },
     };
 }
-function fetchRecord(type, id, params) {
-    if (params === void 0) { params = {}; }
+function fetchRecord(type, id, params = {}) {
     return {
         type: exports.FETCH_RECORDS,
         payload: {
             request: {
                 method: 'GET',
-                url: "/".concat(type, "/").concat(id, "?").concat((0, exports.queryString)(params)),
+                url: `/${type}/${id}?${(0, exports.queryString)(params)}`,
             },
         },
     };
 }
-function saveRecord(record, options) {
-    if (options === void 0) { options = {}; }
+function saveRecord(record, options = {}) {
     console.info('saving record', record, options);
-    var method = record.id ? 'PATCH' : 'POST';
-    var url = "/".concat(record.type);
+    const method = record.id ? 'PATCH' : 'POST';
+    let url = `/${record.type}`;
     if (record.id)
-        url += "/".concat(record.id);
+        url += `/${record.id}`;
     return {
         type: exports.SAVE_RECORD,
         ignoreFail: options.ignoreFail,
         payload: {
             request: {
-                method: method,
-                url: "".concat(url, "?").concat((0, exports.queryString)(options.params || {})),
+                method,
+                url: `${url}?${(0, exports.queryString)(options.params || {})}`,
                 data: { data: record },
             },
         },
@@ -119,11 +103,11 @@ function saveRecord(record, options) {
 function deleteRecord(record) {
     return {
         type: exports.DELETE_RECORD,
-        record: record,
+        record,
         payload: {
             request: {
                 method: 'DELETE',
-                url: "".concat(record.type, "/").concat(record.id),
+                url: `${record.type}/${record.id}`,
             },
         },
     };
